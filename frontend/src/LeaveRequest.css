@@ -1,0 +1,67 @@
+.leave-form {
+  width: 500px;
+  padding: 25px 30px;
+  margin: auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+.leave-form label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.leave-form input,
+.leave-form select,
+.leave-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.leave-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.leave-form .file-upload {
+  margin-top: 10px;
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #777;
+  cursor: pointer;
+  transition: border 0.3s;
+}
+
+.leave-form .file-upload:hover {
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.leave-form button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  background-color: #6c63ff;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leave-form button:hover {
+  background-color: #5a52d4;
+}
