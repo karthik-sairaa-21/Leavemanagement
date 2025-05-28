@@ -1,6 +1,8 @@
-* {
+/* * {
     overflow-x: hidden;
-}
+    margin: 0;
+    padding: 0;
+} */
 
 .grid {
     display: flex;
@@ -17,6 +19,7 @@
     padding: 10px ;
     margin-left: 20px;
     border: solid 2px #dedddb;
+    /* box-shadow: 1px 4px 2px  rgb(180, 175, 175); */
 
 
 }
@@ -62,6 +65,7 @@
     font-size: 20px;
     font-weight: 600;
     color: #2c3e50;
+    margin-right: 45%;
 }
 
 .applyLeave {
@@ -86,9 +90,10 @@
 /* leave request histroy */
 
 .leave-history {
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
-    padding: 10px;
+    /* padding: 10px; */
+    /* height: 10vh; */
     /* background-color: #fff; */
     margin: 20px;
     border-radius: 12px;
@@ -97,8 +102,10 @@
   
   .filters {
     display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
     gap: 20px;
-    /* margin-top: 12px; */
+    margin: 12px;
     flex-wrap: wrap;
   }
   
@@ -115,12 +122,13 @@
 
   /* leave request table  */
   .table-leave-history {
-    width: 95%;
+    width: 98%;
+    height: 52vh !important;
     /* padding: 20px; */
-    margin-left: 20px;
+    margin-left: 10px;
     background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 6px 3px rgba(0, 0, 0, 0.05);
     overflow-x: auto;
   }
   
@@ -186,5 +194,13 @@
     font-size: 20px;
     cursor: pointer;
     color: #333;
+  }
+  
+
+  .no-leave-message {
+    text-align: center !important;
+    font-style: italic !important;
+    color: #777 !important;
+    padding: 12px;
   }
   

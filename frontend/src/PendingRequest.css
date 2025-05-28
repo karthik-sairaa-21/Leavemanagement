@@ -1,0 +1,88 @@
+.pending-requests-container {
+    padding: 30px;
+    background-color: #f6f6f3;
+    min-height: 100vh;
+  }
+  
+  .pending-requests-title {
+    font-size: 26px;
+    color: #7e52de;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .pending-requests-table-wrapper {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+  }
+  
+  .pending-requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    min-width: 800px;
+  }
+  
+  .pending-requests-table thead {
+    background-color: #f0eef4;
+  }
+  
+  .pending-requests-table th,
+  .pending-requests-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .pending-requests-table th {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .pending-requests-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+  
+  .pending-requests-table td {
+    color: #333;
+  }
+  
+  .pending-requests-no-data {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 20px;
+  }
+  
+  .pending-requests-error {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  /* approval */
+  .approve-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+  
+  .reject-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  

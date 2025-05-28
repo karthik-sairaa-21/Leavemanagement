@@ -51,6 +51,12 @@ module.exports = [
     handler: LeaveController.createLeaveRequest
 
   },
+  {
+    method: "GET",  // user leave request 
+    path: '/getSpecificLeaveRequest/{userId}',
+    handler: LeaveController.getLeaveRequest
+
+  },
 
   {
     method: "GET",
@@ -60,12 +66,9 @@ module.exports = [
 
   {
     method: "PUT",
-    path: "/leaveApproval",
+    path: "/leaveApproval/{requestId}/{role}/{status}",
     handler: LeaveController.updateLeaveApproval,
   }
-
-
-
 
 ];
 

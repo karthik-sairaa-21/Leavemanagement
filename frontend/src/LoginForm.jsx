@@ -1,6 +1,8 @@
+// src/LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginForm.css'
+import './LoginForm.css';
+
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +30,9 @@ function LoginForm() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_id', data.user.id);
-      navigate('/Navbar');
+
+    navigate('/navbar'); // ✅ This is correct!
+
     } catch (err) {
       console.error(err);
       setError('Something went wrong.');

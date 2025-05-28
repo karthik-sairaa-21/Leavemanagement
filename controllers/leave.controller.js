@@ -104,6 +104,20 @@ exports.getRemainingLeaveById = async (request, h) => {
   }
 };
 
+//
+exports.getLeaveRequest =async (request,h)=>{
+  try{
+    const userId =request.params.userId;
+    const leaveRequest  = await Leave.getLeaveRequest(userId);
+    return h.response(leaveRequest).code(200);
+  } catch (error) {
+    console.log("Error fetching leave reuqest:", error.message);
+    return h.response({ error: "Internal Server Error" }).code(500);
+  }
+
+  };
+
+
 
 
 
@@ -124,6 +138,31 @@ exports.getLeaveType = async (request, h) => {
 
 
 
+// exports.createLeaveRequest = async (request, h) => {
+//   try {
+//     const userId = request.params.userId;
+//     const { type_id, leave_start_date, leave_end_date, reason } = request.payload;
+
+//     const result = await Leave.createLeaveRequest({
+//       userId,
+//       type_id,
+//       leave_start_date,
+//       leave_end_date,
+//       reason
+//     });
+
+//     return h
+//       .response({
+//         message: "Leave Request submitted successfully",
+//         leave_request_id: result.insertId,
+//       })
+//       .code(201);
+//   } catch (error) {
+//     console.error("Error creating leave request:", error.message);
+//     return h.response({ error: "Internal Server Error" }).code(500);
+//   }
+// };
+
 exports.createLeaveRequest = async (request, h) => {
   try {
     const userId = request.params.userId;
@@ -143,11 +182,18 @@ exports.createLeaveRequest = async (request, h) => {
         leave_request_id: result.insertId,
       })
       .code(201);
+
   } catch (error) {
     console.error("Error creating leave request:", error.message);
-    return h.response({ error: "Internal Server Error" }).code(500);
+    return h
+      .response({ error: error.message })
+      .code(error.statusCode || 500);
   }
 };
+
+
+
+
 
 
 exports.getLeaveRequestrole = async (request, h) => {
@@ -164,7 +210,7 @@ exports.getLeaveRequestrole = async (request, h) => {
 
 exports.updateLeaveApproval = async (request, h) => {
   try {
-    const { requestId, role, status } = request.payload;
+    const { requestId, role, status } = request.params
 
     const result = await Leave.updateLeaveWithApproval({ requestId, role, status });
     return h.response(result).code(200);
@@ -172,6 +218,7 @@ exports.updateLeaveApproval = async (request, h) => {
     console.error("Error in approval update:", err);
     return h.response({ error: err.message }).code(500);
   }
+
 };
 
 

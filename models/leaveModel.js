@@ -22,6 +22,12 @@ exports.getRemainingLeaveById = async (userId) => {
   return result;
 };
 
+exports.getLeaveRequest =async (userId) =>{
+const db=getDB();
+const [result] = await db.query(`SELECT * FROM leave_requests WHERE user_id = ?`, [userId]);
+return result;
+}
+
 
 
 // exports.getLeaveType= async()=>{
@@ -60,36 +66,65 @@ exports.getAllLeaveTypes = async () => {
 
 
 
-
-
-
 exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_end_date, reason }) => {
   const db = getDB();
 
-  // 1. Calculate leave days
+  // 1. Convert dates
   const start = new Date(leave_start_date);
   const end = new Date(leave_end_date);
+
+ 
+  if (start > end) {
+    const error = new Error("Start date must be before end date");
+    error.statusCode = 400;
+    throw error;
+  }
+
+
+  const [duplicateCheck] = await db.query(
+    `SELECT * FROM leave_requests 
+     WHERE user_id = ? 
+       AND ((leave_start_date BETWEEN ? AND ?) 
+         OR (leave_end_date BETWEEN ? AND ?) 
+         OR (? BETWEEN leave_start_date AND leave_end_date)
+         OR (? BETWEEN leave_start_date AND leave_end_date))`,
+    [
+      userId,
+      leave_start_date, leave_end_date,
+      leave_start_date, leave_end_date,
+      leave_start_date,
+      leave_end_date
+    ]
+  );
+
+  if (duplicateCheck.length > 0) {
+    const error = new Error("You cannot use the leave date because it is duplicate");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // 2. Calculate leave days
   const leaveDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
-  // 2. Get leave type details
+  // 3. Get leave type details
   const [typeResult] = await db.query("SELECT * FROM leave_types WHERE type_id = ?", [type_id]);
   if (typeResult.length === 0) throw new Error("Invalid leave type");
 
   const { type_name, total_days_allowed } = typeResult[0];
 
-  // 3. Set default statuses
+  // 4. Set default statuses
   let manager_status = "PENDING";
   let hr_status = "PENDING";
   let director_status = "PENDING";
   let overall_status = "PENDING";
 
-  // 4. Auto-approval logic
-  if ( type_name === "Sick" && leaveDays === 1) {
+  // 5. Auto-approval logic for sick leave 1 day
+  if (type_name === "Sick" && leaveDays === 1) {
     manager_status = hr_status = director_status = overall_status = "APPROVED";
     await updateLeaveBalance(db, userId, type_id, leaveDays, total_days_allowed);
   }
 
-  // 5. Insert leave request
+  // 6. Insert leave request
   const [result] = await db.query(
     `INSERT INTO leave_requests 
      (user_id, type_id, leave_start_date, leave_end_date, reason,
@@ -110,6 +145,56 @@ exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_e
 
   return result;
 };
+
+
+
+// exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_end_date, reason }) => {
+//   const db = getDB();
+
+//   // 1. Calculate leave days
+//   const start = new Date(leave_start_date);
+//   const end = new Date(leave_end_date);
+//   const leaveDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+//   // 2. Get leave type details
+//   const [typeResult] = await db.query("SELECT * FROM leave_types WHERE type_id = ?", [type_id]);
+//   if (typeResult.length === 0) throw new Error("Invalid leave type");
+
+//   const { type_name, total_days_allowed } = typeResult[0];
+
+//   // 3. Set default statuses
+//   let manager_status = "PENDING";
+//   let hr_status = "PENDING";
+//   let director_status = "PENDING";
+//   let overall_status = "PENDING";
+
+//   // 4. Auto-approval logic
+//   if ( type_name === "Sick" && leaveDays === 1) {
+//     manager_status = hr_status = director_status = overall_status = "APPROVED";
+//     await updateLeaveBalance(db, userId, type_id, leaveDays, total_days_allowed);
+//   }
+
+//   // 5. Insert leave request
+//   const [result] = await db.query(
+//     `INSERT INTO leave_requests 
+//      (user_id, type_id, leave_start_date, leave_end_date, reason,
+//       manager_status, hr_status, director_status, overall_status)
+//      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+//     [
+//       userId,
+//       type_id,
+//       leave_start_date,
+//       leave_end_date,
+//       reason,
+//       manager_status,
+//       hr_status,
+//       director_status,
+//       overall_status,
+//     ]
+//   );
+
+//   return result;
+// };
 
 
 
@@ -137,9 +222,9 @@ exports.updateLeaveWithApproval = async ({ requestId, role, status }) => {
 
   // 2. Determine which status to update
   let roleColumn;
-  if (role === "manager") roleColumn = "manager_status";
-  else if (role === "hr") roleColumn = "hr_status";
-  else if (role === "director") roleColumn = "director_status";
+  if (role === "MANAGER") roleColumn = "manager_status";
+  else if (role === "HR") roleColumn = "hr_status";
+  else if (role === "DIRECTOR") roleColumn = "director_status";
   else throw new Error("Invalid role");
 
   // 3. Update the status
