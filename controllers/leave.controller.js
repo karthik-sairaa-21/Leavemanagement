@@ -4,6 +4,36 @@ const { generateToken } = require('../utils/jwt');
 const { getUserByEmail } = require('../models/leaveModel');
 
 
+// exports.getAllusers = async (request, h) => {
+//   try {
+//     const users = await Leave.getAllusers();
+//     return h.response(users).code(200);
+//   }
+//   catch (error) {
+//     console.log("Error fetching users:", error.message);
+//     return h.response({ error: "Internal Server Error" }).code(500);
+//   }
+// };
+
+// controllers/authController.js
+
+
+
+// exports.getRemainingLeave = async (request, h) => {
+//   try {
+//     const RemainingLeave = await Leave.getRemainingLeave();
+//     return h.response(RemainingLeave).code(200);
+
+//   }
+//   catch (error) {
+//     console.log("Error fetching remaining leave:", error.message);
+//     return h.response({ error: "Internal Server Error" }).code(500);
+//   }
+// }
+
+
+
+
 
 exports.login = async (request, h) => {
   const { email, password } = request.payload;
@@ -15,7 +45,7 @@ exports.login = async (request, h) => {
     }
 
     const isMatch = await comparePasswords(password, user.password);
-    console.log("Password match result:", isMatch);
+    // console.log("Password match result:", isMatch);
     if (!isMatch) {
       return h.response({ error: 'Invalid email or password' }).code(401);
     }
@@ -37,37 +67,15 @@ exports.login = async (request, h) => {
   }
 };
 
-// exports.getAllusers = async (request, h) => {
-//   try {
-//     const users = await Leave.getAllusers();
-//     return h.response(users).code(200);
-//   }
-//   catch (error) {
-//     console.log("Error fetching users:", error.message);
-//     return h.response({ error: "Internal Server Error" }).code(500);
-//   }
-// };
-
-// controllers/authController.js
-
-
-
-
-
-
-
-
-
-
 
 
 exports.getUserById = async (request, h) => {
   try {
     const userId = request.params.id;
-    console.log("User ID from params:", userId);
+    // console.log("User ID from params:", userId);
 
     const user = await Leave.getUserById(userId);
-    console.log("User fetched from DB:", user);
+    // console.log("User fetched from DB:", user);
 
     if (!user) {
       return h.response({ message: "User not found" }).code(404);
@@ -80,17 +88,6 @@ exports.getUserById = async (request, h) => {
   }
 };
 
-exports.getRemainingLeave = async (request, h) => {
-  try {
-    const RemainingLeave = await Leave.getRemainingLeave();
-    return h.response(RemainingLeave).code(200);
-
-  }
-  catch (error) {
-    console.log("Error fetching remaining leave:", error.message);
-    return h.response({ error: "Internal Server Error" }).code(500);
-  }
-}
 
 
 exports.getRemainingLeaveById = async (request, h) => {
@@ -104,27 +101,6 @@ exports.getRemainingLeaveById = async (request, h) => {
   }
 };
 
-//
-exports.getLeaveRequest =async (request,h)=>{
-  try{
-    const userId =request.params.userId;
-    const leaveRequest  = await Leave.getLeaveRequest(userId);
-    return h.response(leaveRequest).code(200);
-  } catch (error) {
-    console.log("Error fetching leave reuqest:", error.message);
-    return h.response({ error: "Internal Server Error" }).code(500);
-  }
-
-  };
-
-
-
-
-
-
-
-
-
 
 exports.getLeaveType = async (request, h) => {
   try {
@@ -137,36 +113,15 @@ exports.getLeaveType = async (request, h) => {
 };
 
 
-
-// exports.createLeaveRequest = async (request, h) => {
-//   try {
-//     const userId = request.params.userId;
-//     const { type_id, leave_start_date, leave_end_date, reason } = request.payload;
-
-//     const result = await Leave.createLeaveRequest({
-//       userId,
-//       type_id,
-//       leave_start_date,
-//       leave_end_date,
-//       reason
-//     });
-
-//     return h
-//       .response({
-//         message: "Leave Request submitted successfully",
-//         leave_request_id: result.insertId,
-//       })
-//       .code(201);
-//   } catch (error) {
-//     console.error("Error creating leave request:", error.message);
-//     return h.response({ error: "Internal Server Error" }).code(500);
-//   }
-// };
-
 exports.createLeaveRequest = async (request, h) => {
   try {
     const userId = request.params.userId;
     const { type_id, leave_start_date, leave_end_date, reason } = request.payload;
+
+    // Basic input validation
+    if (!type_id || !leave_start_date || !leave_end_date || !reason) {
+      return h.response({ error: "All fields are required." }).code(400);
+    }
 
     const result = await Leave.createLeaveRequest({
       userId,
@@ -176,24 +131,31 @@ exports.createLeaveRequest = async (request, h) => {
       reason
     });
 
-    return h
-      .response({
-        message: "Leave Request submitted successfully",
-        leave_request_id: result.insertId,
-      })
-      .code(201);
+    return h.response({
+      message: "Leave Request submitted successfully",
+      leave_request_id: result.insertId,
+    }).code(201);
 
   } catch (error) {
     console.error("Error creating leave request:", error.message);
-    return h
-      .response({ error: error.message })
-      .code(error.statusCode || 500);
+    return h.response({ error: error.message }).code(error.statusCode || 500);
   }
 };
 
 
 
 
+exports.getLeaveRequest =async (request,h)=>{
+  try{
+    const userId =request.params.userId;
+    const leaveRequest  = await Leave.getLeaveRequest(userId);
+    return h.response(leaveRequest).code(200);
+  } catch (error) {
+    console.log("Error fetching leave reuqest:", error.message);
+    return h.response({ error: "Internal Server Error" }).code(500);
+  }
+
+  };
 
 
 exports.getLeaveRequestrole = async (request, h) => {
@@ -208,18 +170,20 @@ exports.getLeaveRequestrole = async (request, h) => {
   }
 };
 
+
+
 exports.updateLeaveApproval = async (request, h) => {
   try {
-    const { requestId, role, status } = request.params
+    const { requestId, role, status } = request.params;
 
-    const result = await Leave.updateLeaveWithApproval({ requestId, role, status });
+    const result = await Leave.approveLeaveRequest({ requestId, role, status });
     return h.response(result).code(200);
   } catch (err) {
     console.error("Error in approval update:", err);
     return h.response({ error: err.message }).code(500);
   }
-
 };
+  
 
 
 

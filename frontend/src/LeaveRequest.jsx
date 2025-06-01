@@ -2,7 +2,6 @@ import './LeaveRequest.css';
 import { useState, useEffect } from 'react';
 
 function LeaveRequest(props) {
-  console.log(props);
   const [formData, setFormData] = useState({
     leaveType: '',
     startDate: '',
@@ -13,6 +12,10 @@ function LeaveRequest(props) {
   const [leaveTypes, setLeaveTypes] = useState([]);
 
   const userId = localStorage.getItem('user_id');
+  // console.log(userId)
+
+  // Today's date in YYYY-MM-DD format
+  const todayStr = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     // Fetch leave types from API
@@ -42,16 +45,25 @@ function LeaveRequest(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
-  
-    // ✅ Condition 1: Start date must be before or same as end date
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time portion for comparison
+
+    // Condition 1: Start date must be before or same as end date
     if (start > end) {
       alert("Start date must be before or equal to end date.");
       return;
     }
-  
+
+    // Condition 2: Prevent past date submission (redundant if using min in input, but good backup)
+    if (start < today || end < today) {
+      alert("Leave dates cannot be in the past.");
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:3000/userLeaveRequest/${userId}`, {
         method: 'POST',
@@ -65,37 +77,34 @@ function LeaveRequest(props) {
           reason: formData.reason
         })
       });
-  
+
       const data = await response.json();
-  
-      // ✅ Backend condition: Check for duplicate leave error
+
       if (!response.ok) {
         if (data.error === "You cannot use the leave date because it is duplicate") {
           alert("You've already applied for leave for these dates.");
         } else {
           alert('Failed: ' + data.error);
         }
-        
         return;
       }
-  
+
       alert('Leave request submitted successfully!');
       if (props.onSuccess) props.onSuccess();
-  
-      // Optionally reset form
+
+      // Reset form
       setFormData({
         leaveType: '',
         startDate: '',
         endDate: '',
         reason: ''
       });
-  
+
     } catch (err) {
       console.error(err);
       alert('Something went wrong.');
     }
   };
-  
 
   return (
     <form className="leave-form" onSubmit={handleSubmit}>
@@ -110,13 +119,32 @@ function LeaveRequest(props) {
       </select>
 
       <label htmlFor="startDate">Start Date</label>
-      <input type="date" id="startDate" value={formData.startDate} onChange={handleChange} required />
+      <input
+        type="date"
+        id="startDate"
+        min={todayStr}
+        value={formData.startDate}
+        onChange={handleChange}
+        required
+      />
 
       <label htmlFor="endDate">End Date</label>
-      <input type="date" id="endDate" value={formData.endDate} onChange={handleChange} required />
+      <input
+        type="date"
+        id="endDate"
+        min={formData.startDate || todayStr} // Make end date depend on selected start date
+        value={formData.endDate}
+        onChange={handleChange}
+        required
+      />
 
       <label htmlFor="reason">Reason</label>
-      <textarea id="reason" value={formData.reason} onChange={handleChange} required></textarea>
+      <textarea
+        id="reason"
+        value={formData.reason}
+        onChange={handleChange}
+        required
+      ></textarea>
 
       <button type="submit">Apply Leave</button>
     </form>
@@ -124,3 +152,6 @@ function LeaveRequest(props) {
 }
 
 export default LeaveRequest;
+
+
+
