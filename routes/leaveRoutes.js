@@ -1,4 +1,4 @@
-const LeaveController = require('../controllers/leave.controller');
+const LeaveController = require('../controllers/leaveController');
 
 
 module.exports = [
@@ -8,7 +8,7 @@ module.exports = [
   //   handler: LeaveController.getAllusers,
 
   // },
-    // {
+  // {
   //   method: 'GET',
   //   path: '/leaveBalance',  //remaining leave query
   //   handler: LeaveController.getRemainingLeave
@@ -40,20 +40,20 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/leaveType',              
+    path: '/leaveType',
     handler: LeaveController.getLeaveType     //(ok)
   }
   ,
 
   {
     method: "POST",  // user leave request          (ok)
-    path: '/userLeaveRequest/{userId}',       
+    path: '/userLeaveRequest/{userId}',
     handler: LeaveController.createLeaveRequest
 
   },
   {
     method: "GET",  // user leave request      (ok)
-    path: '/getSpecificLeaveRequest/{userId}',     
+    path: '/getSpecificLeaveRequest/{userId}',
     handler: LeaveController.getLeaveRequest
 
   },
@@ -65,12 +65,29 @@ module.exports = [
   },
 
   {
+    method: "GET",
+    path: "/getApprovedRequest/{role_id}",  //for calendar
+    handler: LeaveController.getApproveRequest
+  },
+
+  {
     method: "PUT",
     path: "/leaveApproval/{requestId}/{role}/{status}",
     handler: LeaveController.updateLeaveApproval,
   }
 
 
+  ,
+  {
+    method: "POST",
+    path: "/users/upload",
+    handler: LeaveController.createUsers
+  }
+  ,
   
+
+
+
+
 ];
 

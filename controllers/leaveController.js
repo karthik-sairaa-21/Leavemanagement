@@ -165,7 +165,19 @@ exports.getLeaveRequestrole = async (request, h) => {
     const leaveRequests = await Leave.getLeaveRequestsByRoleId(role_id);
     return h.response(leaveRequests).code(200);
   } catch (error) {
-    console.error("Error fetching leave requests:", error);
+    console.log("Error fetching leave requests:", error);
+    return h.response({ error: "Internal Server Error" }).code(500);
+  }
+};
+
+exports.getApproveRequest = async (request, h) => {
+  try {
+    const { role_id } = request.params;
+
+    const leaveRequests = await Leave.getApprovedRequest(role_id);
+    return h.response(leaveRequests).code(200);
+  } catch (error) {
+    console.log("Error fetching leave requests:", error);
     return h.response({ error: "Internal Server Error" }).code(500);
   }
 };
@@ -184,6 +196,36 @@ exports.updateLeaveApproval = async (request, h) => {
   }
 };
   
+
+
+
+
+//creating the users
+
+
+exports.createUsers = async (request, h) => {
+  try {
+    const { name, role, manager_id, hr_id, director_id, email, password, status } = request.payload;
+
+    // Optional: Convert `undefined` to null if fields are not sent
+    const newUser = await Leave.uploadUser(
+      name,
+      role,
+      manager_id ?? null,
+      hr_id ?? null,
+      director_id ?? null,
+      email,
+      password,
+      status
+    );
+
+    return h.response(newUser).code(200);
+  } catch (err) {
+    console.error("Error in creating the user", err);
+    return h.response({ error: err.message }).code(500);
+  }
+};
+
 
 
 

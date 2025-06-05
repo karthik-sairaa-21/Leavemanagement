@@ -1,21 +1,16 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
-// Used only when you want to generate a hash manually
-async function generateHash() {
-  const password = 'leave';  // put your new password here
-  const hash = await bcrypt.hash(password, 10);
-  console.log("Hashed password:", hash);
+async function generateHash(password) {
+  if (!password) throw new Error("Password is required to hash.");
+  return await bcrypt.hash(password, 10);
 }
 
-// This is the function used in login
 async function comparePasswords(plainPassword, hashedPassword) {
   return await bcrypt.compare(plainPassword, hashedPassword);
 }
 
-// Export only the compare function
 module.exports = {
+  generateHash,
   comparePasswords
-};
-
-// If you want to generate manually, uncomment this:
-generateHash();
+}
+;

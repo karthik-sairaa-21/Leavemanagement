@@ -65,8 +65,7 @@
 
 
 
-// import React from 'react';
-
+// import React from 'react'
 const formatDate = (dateStr) => {
   if (!dateStr) return 'N/A';
   const date = new Date(dateStr);
@@ -81,7 +80,6 @@ const LeaveHistoryTable = ({ leaveRequest, leaveTypes }) => {
   const user = userJson ? JSON.parse(userJson) : null;
   const role = user?.role?.toUpperCase() ;
 
-  console.log("Logged in role:", role);
 
 
 
@@ -110,18 +108,24 @@ const LeaveHistoryTable = ({ leaveRequest, leaveTypes }) => {
       <td key="submitted">{(formatDate(new Date()))}</td>,
     ];
 
-    if (role === 'EMPLOYEE') {
-      row.push(<td key="manager">{request.manager_status || 'N/A'}</td>);
-      row.push(<td key="hr">{request.hr_status || 'N/A'}</td>);
-      row.push(<td key="director">{request.director_status || 'N/A'}</td>);
-    } else if (role === 'MANAGER') {
-      row.push(<td key="hr">{request.hr_status || 'N/A'}</td>);
-      row.push(<td key="director">{request.director_status || 'N/A'}</td>);
-    } else if (role === 'HR') {
-      row.push(<td key="director">{request.director_status || 'N/A'}</td>);
-    }
+const renderStatus = (status) => (
+  <span className={`status-label ${status?.toLowerCase() || 'na'}`}>
+    {status || 'N/A'}
+  </span>
+);
 
-    row.push(<td key="overall">{request.overall_status || 'N/A'}</td>);
+if (role === 'EMPLOYEE') {
+  row.push(<td key="manager">{renderStatus(request.manager_status)}</td>);
+  row.push(<td key="hr">{renderStatus(request.hr_status)}</td>);
+  row.push(<td key="director">{renderStatus(request.director_status)}</td>);
+} else if (role === 'MANAGER') {
+  row.push(<td key="hr">{renderStatus(request.hr_status)}</td>);
+  row.push(<td key="director">{renderStatus(request.director_status)}</td>);
+} else if (role === 'HR') {
+  row.push(<td key="director">{renderStatus(request.director_status)}</td>);
+}
+
+row.push(<td key="overall">{renderStatus(request.overall_status)}</td>);
     return <tr key={request.id}>{row}</tr>;
   };
 

@@ -5,15 +5,15 @@ import LeaveHistoryTable from './LeaveHistoryTable';
 
 
 // For date format
-const formatDate = (dateStr) => {
-  if (!dateStr) return 'N/A';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-};
+// const formatDate = (dateStr) => {
+//   if (!dateStr) return 'N/A';
+//   const date = new Date(dateStr);
+//   return date.toLocaleDateString('en-GB', {
+//     day: '2-digit',
+//     month: 'short',
+//     year: 'numeric',
+//   });
+// };
 
 function Home() {
   const [showForm, setShowForm] = useState(false);

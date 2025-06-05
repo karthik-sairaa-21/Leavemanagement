@@ -14,9 +14,10 @@ body {
 
 /* Layout */
 .navbar-container {
-  display: flex;
+ display: flex;
   height: 100vh;
   width: 100vw;
+
 }
 
 /* Sidebar */
@@ -92,10 +93,48 @@ body {
   cursor: pointer;
 }
 
+.Calender {
+  background-color: #f0f4ff;
+  padding: 20px;
+  margin-top: 30px;
+  border-radius: 10px;
+  border-left: 5px solid #6c63ff;
+  box-shadow: 0 4px 8px 2px rgba(0, 0, 0, 0.05);
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.calender-button {
+  color: #2b3a55;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* space between icon and text */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Login Out */
 .logout-container{
-  margin-top: 260%;
+  margin-top: auto;
 }
 
 

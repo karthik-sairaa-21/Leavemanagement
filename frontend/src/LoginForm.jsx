@@ -30,8 +30,15 @@ function LoginForm() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_id', data.user.id);
-
-    navigate('/navbar'); // ✅ This is correct!
+      const user = JSON.parse(localStorage.getItem('user'));
+      const role = user?.role;
+      if(role==="Admin"){
+        navigate('/uploadBulkUsers')
+      }
+      else{
+         navigate('/navbar'); // ✅ This is correct!
+      }
+    
 
     } catch (err) {
       console.error(err);
