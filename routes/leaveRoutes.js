@@ -30,7 +30,6 @@ module.exports = [
   },
 
 
-
   {
     method: 'GET',
     path: '/leaveBalance/{userId}', // specific user leave balance  (ok)

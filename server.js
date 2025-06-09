@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./worker/worker')
+
 
 const Hapi = require('@hapi/hapi');
 const leaveroute = require('./routes/leaveRoutes');
@@ -27,3 +27,5 @@ const init = async () => {
 };
 
 init();
+
+

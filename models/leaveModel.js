@@ -90,165 +90,25 @@ WHERE (
 
 
 
+function getWorkingDays(startDate, endDate) {
+  let count = 0;
+  const current = new Date(startDate);
+
+  while (current <= endDate) {
+    const day = current.getDay();
+    console.log(day) // 0 = Sunday, 6 = Saturday
+    if (day !== 0 && day !== 6) {
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+
+  return count;
+}
 
 
 
 
-
-
-
-
-
-
-// exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_end_date, reason }) => {
-//   const db = getDB();
-
-//   const start = new Date(leave_start_date);
-//   const end = new Date(leave_end_date);
-
-//   if (start > end) {
-//     const error = new Error("Start date must be before end date");
-//     error.statusCode = 400;
-//     throw error;
-//   }
-
-//   // Check for overlapping leave
-//   const [duplicateCheck] = await db.query(
-//     `SELECT * FROM leave_requests 
-//      WHERE user_id = ? 
-//        AND ((leave_start_date BETWEEN ? AND ?) 
-//          OR (leave_end_date BETWEEN ? AND ?)
-//          OR (? BETWEEN leave_start_date AND leave_end_date)
-//          OR (? BETWEEN leave_start_date AND leave_end_date))
-//        AND overall_status IN ('PENDING', 'APPROVED')`,
-//     [userId, leave_start_date, leave_end_date, leave_start_date, leave_end_date, leave_start_date, leave_end_date]
-//   );
-//   if (duplicateCheck.length > 0) {
-//     const error = new Error("Duplicate leave request for selected dates");
-//     error.statusCode = 400;
-//     throw error;
-//   }
-
-//   const leaveDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-//   const [userRows] = await db.query("SELECT role FROM users WHERE user_id = ?", [userId]);
-//   if (userRows.length === 0) {
-//     const error = new Error("User not found");
-//     error.statusCode = 404;
-//     throw error;
-//   }
-//   const role = userRows[0].role.toUpperCase();
-//   console.log("role daa", role);
-
-
-
-//   const [typeResult] = await db.query("SELECT * FROM leave_types WHERE type_id = ?", [type_id]);
-//   if (typeResult.length === 0) throw new Error("Invalid leave type");
-
-//   const { type_name, total_days_allowed } = typeResult[0];
-
-//   const [balanceRows] = await db.query(
-//     "SELECT * FROM leave_balance WHERE user_id = ? AND type_id = ?",
-//     [userId, type_id]
-//   );
-//   let currentBalance = balanceRows.length ? balanceRows[0].remaining_leave : null;
-//   const availableBalance = currentBalance !== null ? currentBalance : total_days_allowed;
-
-//   if (currentBalance === null) {
-//     await db.query(
-//       `INSERT INTO leave_balance (user_id, type_id, leave_taken, remaining_leave) VALUES (?, ?, ?, ?)`,
-//       [userId, type_id, 0, total_days_allowed]
-//     );
-//   }
-
-//   // Default statuses
-//   let manager_status = "PENDING";
-//   let hr_status = "NOT_APPLICABLE";
-//   let director_status = "NOT_APPLICABLE";
-//   let overall_status = "PENDING";
-
-//   // const role = user.role.toUpperCase();
-
-//   if (role === "EMPLOYEE") {
-//     if (type_name === "Sick" && leaveDays === 1 && availableBalance >= 1) {
-//       manager_status = hr_status = director_status = overall_status = "APPROVED";
-//       await updateLeaveBalance(db, userId, type_id, leaveDays, total_days_allowed);
-//     } else {
-//       let levelsNeeded = 1;
-
-//       if ((type_name === "Casual" || type_name === "Earned") && leaveDays <= 1) {
-//         levelsNeeded = 1;
-//       } else if ((type_name === "Casual" || type_name === "Earned") && leaveDays <= 3) {
-//         levelsNeeded = 2;
-//       } else if ((type_name === "Casual" || type_name === "Earned") && leaveDays > 3) {
-//         levelsNeeded = 3;
-//       }
-
-//       if (type_name === "Sick") {
-//         if (leaveDays === 2 && availableBalance >= 2) levelsNeeded = 1;
-//         else if (leaveDays <= 4 && availableBalance >= leaveDays) levelsNeeded = 2;
-//         else levelsNeeded = 3;
-//       }
-
-//       // On creation, only manager status is PENDING,
-//       // HR and Director are NOT_APPLICABLE initially
-//       manager_status = "PENDING";
-//       // hr_status = "NOT_APPLICABLE";
-//       // director_status = "NOT_APPLICABLE";
-
-//       // You can save levelsNeeded somewhere if needed for approval flow
-//     }
-//   }
-
-
-//   else if (role === "MANAGER") {
-//     manager_status = "APPROVED"; // Manager auto-approves their request
-
-//     if (type_name === "Sick" && leaveDays === 1 && availableBalance >= 1) {
-//       hr_status = "APPROVED";
-//       director_status = "APPROVED";
-//       overall_status = "APPROVED";
-//       await updateLeaveBalance(db, userId, type_id, leaveDays, total_days_allowed);
-//     } else {
-//       hr_status = "PENDING";         // Always pending for manager request
-//       director_status = "NOT_APPLICABLE"; // Becomes PENDING after HR approves
-//     }
-//   }
-//   else if (role === "HR") {
-//     manager_status = "APPROVED"; // Auto-approved
-//     hr_status = "APPROVED";      // Self-approved
-
-//     if (type_name === "Sick" && leaveDays === 1 && availableBalance >= 1) {
-//       director_status = "APPROVED";
-//       overall_status = "APPROVED";
-//       await updateLeaveBalance(db, userId, type_id, leaveDays, total_days_allowed);
-//     } else {
-//       director_status = "PENDING"; // Always pending for HR request
-//     }
-//   }
-
-
-//   // Insert leave request with statuses
-//   const [result] = await db.query(
-//     `INSERT INTO leave_requests 
-//      (user_id, type_id, leave_start_date, leave_end_date, reason,
-//       manager_status, hr_status, director_status, overall_status)
-//      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-//     [
-//       userId,
-//       type_id,
-//       leave_start_date,
-//       leave_end_date,
-//       reason,
-//       manager_status,
-//       hr_status,
-//       director_status,
-//       overall_status,
-//     ]
-//   );
-
-//   return result;
-// };
 
 
 exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_end_date, reason }) => {
@@ -279,7 +139,9 @@ exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_e
     throw error;
   }
 
-  const leaveDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+const leaveDays = getWorkingDays(start, end);
+  console.log("leaveDays",leaveDays)
+  
 
   const [userRows] = await db.query("SELECT role FROM users WHERE user_id = ?", [userId]);
   if (userRows.length === 0) {
@@ -422,132 +284,10 @@ exports.createLeaveRequest = async ({ userId, type_id, leave_start_date, leave_e
 
 
 
-exports.approveLeaveRequest = async ({ requestId, role, status }) => {
-  const db = getDB();
-
-  // Fetch leave request with leave type info
-  const [rows] = await db.query(`
-    SELECT lr.*, lt.type_name 
-    FROM leave_requests lr 
-    JOIN leave_types lt ON lr.type_id = lt.type_id 
-    WHERE leave_request_id = ?
-  `, [requestId]);
-
-  if (rows.length === 0) throw new Error("Leave request not found");
-
-  const request = rows[0];
-  const {
-    user_id,
-    type_id,
-    leave_start_date,
-    leave_end_date,
-    manager_status,
-    hr_status,
-    director_status,
-    type_name,
-  } = request;
-
-  const leaveDays = Math.ceil((new Date(leave_end_date) - new Date(leave_start_date)) / (1000 * 60 * 60 * 24)) + 1;
-
-  // Determine levels needed (same as createLeaveRequest)
-  let levelsNeeded = 1;
-  if (type_name === "Casual" || type_name === "Earned") {
-    if (leaveDays === 1) levelsNeeded = 1;
-    else if (leaveDays <= 3) levelsNeeded = 2;
-    else levelsNeeded = 3;
-  } else if (type_name === "Sick") {
-    if (leaveDays === 1) levelsNeeded = 0; // auto-approved at creation, so no approval needed here
-    else if (leaveDays === 2) levelsNeeded = 1;
-    else if (leaveDays <= 4) levelsNeeded = 2;
-    else levelsNeeded = 3;
-  } else {
-    levelsNeeded = 1; // Default fallback
-  }
-
-  // Handle REJECTION
-  if (status === "REJECTED") {
-    let updateField = "";
-    if (role === "MANAGER") updateField = "manager_status";
-    else if (role === "HR") updateField = "hr_status";
-    else if (role === "DIRECTOR") updateField = "director_status";
-    else throw new Error("Invalid role for rejection");
-
-    await db.query(
-      `UPDATE leave_requests SET ${updateField} = 'REJECTED', overall_status = 'REJECTED' WHERE leave_request_id = ?`,
-      [requestId]
-    );
-
-    return { message: `${role} rejected the leave` };
-  }
-
-  // Handle APPROVAL
-  if (role === "MANAGER" && manager_status === "PENDING") {
-    // Manager approves
-    let updates = [`manager_status = 'APPROVED'`];
-
-    if (levelsNeeded === 1) {
-      // If only manager approval needed, overall approved immediately
-      updates.push(`overall_status = 'APPROVED'`);
-      await updateLeaveBalance(db, user_id, type_id, leaveDays);
-    } else {
-      // If more levels needed, HR moves from WAITING to PENDING
-      if (hr_status === "WAITING_FOR_L1_APPROVAL" || hr_status === "NOT_APPLICABLE") {
-        updates.push(`hr_status = 'PENDING'`);
-      }
-    }
-
-    await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
-
-  } else if (role === "HR" && hr_status === "PENDING") {
-    // HR approves
-    let updates = [`hr_status = 'APPROVED'`];
-
-    if (levelsNeeded === 2) {
-      // If HR is final approver, approve overall
-      updates.push(`overall_status = 'APPROVED'`);
-      await updateLeaveBalance(db, user_id, type_id, leaveDays);
-    } else if (levelsNeeded === 3) {
-      // Director moves from WAITING to PENDING on HR approval
-      if (director_status === "WAITING_FOR_L2_APPROVAL" || director_status === "NOT_APPLICABLE") {
-        updates.push(`director_status = 'PENDING'`);
-      }
-    }
-
-    await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
-
-  } else if (role === "DIRECTOR" && director_status === "PENDING") {
-    // Director approves - final approval
-    await db.query(
-      `UPDATE leave_requests 
-       SET director_status = 'APPROVED', overall_status = 'APPROVED' 
-       WHERE leave_request_id = ?`,
-      [requestId]
-    );
-    await updateLeaveBalance(db, user_id, type_id, leaveDays);
-
-  } else {
-    throw new Error("Invalid approval flow or already approved");
-  }
-
-  return { message: `${role} approved the leave` };
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
 // exports.approveLeaveRequest = async ({ requestId, role, status }) => {
 //   const db = getDB();
 
-//   // Fetch leave request
+//   // Fetch leave request with leave type info
 //   const [rows] = await db.query(`
 //     SELECT lr.*, lt.type_name 
 //     FROM leave_requests lr 
@@ -571,16 +311,19 @@ exports.approveLeaveRequest = async ({ requestId, role, status }) => {
 
 //   const leaveDays = Math.ceil((new Date(leave_end_date) - new Date(leave_start_date)) / (1000 * 60 * 60 * 24)) + 1;
 
-//   // Determine levels needed
+//   // Determine levels needed (same as createLeaveRequest)
 //   let levelsNeeded = 1;
-//   if ((type_name === "Casual" || type_name === "Earned")) {
+//   if (type_name === "Casual" || type_name === "Earned") {
 //     if (leaveDays === 1) levelsNeeded = 1;
 //     else if (leaveDays <= 3) levelsNeeded = 2;
 //     else levelsNeeded = 3;
 //   } else if (type_name === "Sick") {
-//     if (leaveDays === 2) levelsNeeded = 1;
+//     if (leaveDays === 1) levelsNeeded = 0; // auto-approved at creation, so no approval needed here
+//     else if (leaveDays === 2) levelsNeeded = 1;
 //     else if (leaveDays <= 4) levelsNeeded = 2;
 //     else levelsNeeded = 3;
+//   } else {
+//     levelsNeeded = 1; // Default fallback
 //   }
 
 //   // Handle REJECTION
@@ -601,26 +344,33 @@ exports.approveLeaveRequest = async ({ requestId, role, status }) => {
 
 //   // Handle APPROVAL
 //   if (role === "MANAGER" && manager_status === "PENDING") {
+//     // Manager approves
 //     let updates = [`manager_status = 'APPROVED'`];
 
 //     if (levelsNeeded === 1) {
+//       // If only manager approval needed, overall approved immediately
 //       updates.push(`overall_status = 'APPROVED'`);
 //       await updateLeaveBalance(db, user_id, type_id, leaveDays);
 //     } else {
-//       updates.push(`hr_status = 'PENDING'`);
+//       // If more levels needed, HR moves from WAITING to PENDING
+//       if (hr_status === "WAITING_FOR_L1_APPROVAL" || hr_status === "NOT_APPLICABLE") {
+//         updates.push(`hr_status = 'PENDING'`);
+//       }
 //     }
 
 //     await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
 
 //   } else if (role === "HR" && hr_status === "PENDING") {
+//     // HR approves
 //     let updates = [`hr_status = 'APPROVED'`];
 
 //     if (levelsNeeded === 2) {
+//       // If HR is final approver, approve overall
 //       updates.push(`overall_status = 'APPROVED'`);
 //       await updateLeaveBalance(db, user_id, type_id, leaveDays);
 //     } else if (levelsNeeded === 3) {
-//       // 🔥 FIX: If director_status is still NOT_APPLICABLE, update it to PENDING
-//       if (director_status === "NOT_APPLICABLE") {
+//       // Director moves from WAITING to PENDING on HR approval
+//       if (director_status === "WAITING_FOR_L2_APPROVAL" || director_status === "NOT_APPLICABLE") {
 //         updates.push(`director_status = 'PENDING'`);
 //       }
 //     }
@@ -628,6 +378,7 @@ exports.approveLeaveRequest = async ({ requestId, role, status }) => {
 //     await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
 
 //   } else if (role === "DIRECTOR" && director_status === "PENDING") {
+//     // Director approves - final approval
 //     await db.query(
 //       `UPDATE leave_requests 
 //        SET director_status = 'APPROVED', overall_status = 'APPROVED' 
@@ -647,8 +398,112 @@ exports.approveLeaveRequest = async ({ requestId, role, status }) => {
 
 
 
+// 🔧 Helper to count actual working days (excluding Sat & Sun)
 
-// inside leaveModel.js
+
+exports.approveLeaveRequest = async ({ requestId, role, status }) => {
+  const db = getDB();
+
+  const [rows] = await db.query(`
+    SELECT lr.*, lt.type_name 
+    FROM leave_requests lr 
+    JOIN leave_types lt ON lr.type_id = lt.type_id 
+    WHERE leave_request_id = ?
+  `, [requestId]);
+
+  if (rows.length === 0) throw new Error("Leave request not found");
+
+  const request = rows[0];
+  const {
+    user_id,
+    type_id,
+    leave_start_date,
+    leave_end_date,
+    manager_status,
+    hr_status,
+    director_status,
+    type_name,
+  } = request;
+
+  const start = new Date(leave_start_date);
+  const end = new Date(leave_end_date);
+  const leaveDays = getWorkingDays(start, end); // ✅ updated logic
+
+  // Determine approval levels
+  let levelsNeeded = 1;
+  if (type_name === "Casual" || type_name === "Earned") {
+    if (leaveDays === 1) levelsNeeded = 1;
+    else if (leaveDays <= 3) levelsNeeded = 2;
+    else levelsNeeded = 3;
+  } else if (type_name === "Sick") {
+    if (leaveDays === 1) levelsNeeded = 0;
+    else if (leaveDays === 2) levelsNeeded = 1;
+    else if (leaveDays <= 4) levelsNeeded = 2;
+    else levelsNeeded = 3;
+  }
+
+  // 💢 Handle rejection
+  if (status === "REJECTED") {
+    let updateField = "";
+    if (role === "MANAGER") updateField = "manager_status";
+    else if (role === "HR") updateField = "hr_status";
+    else if (role === "DIRECTOR") updateField = "director_status";
+    else throw new Error("Invalid role for rejection");
+
+    await db.query(
+      `UPDATE leave_requests 
+       SET ${updateField} = 'REJECTED', overall_status = 'REJECTED' 
+       WHERE leave_request_id = ?`,
+      [requestId]
+    );
+    return { message: `${role} rejected the leave` };
+  }
+
+  // ✅ Handle approval
+  if (role === "MANAGER" && manager_status === "PENDING") {
+    const updates = [`manager_status = 'APPROVED'`];
+
+    if (levelsNeeded === 1) {
+      updates.push(`overall_status = 'APPROVED'`);
+      await updateLeaveBalance(db, user_id, type_id, leaveDays);
+    } else {
+      if (hr_status === "WAITING_FOR_L1_APPROVAL" || hr_status === "NOT_APPLICABLE") {
+        updates.push(`hr_status = 'PENDING'`);
+      }
+    }
+
+    await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
+
+  } else if (role === "HR" && hr_status === "PENDING") {
+    const updates = [`hr_status = 'APPROVED'`];
+
+    if (levelsNeeded === 2) {
+      updates.push(`overall_status = 'APPROVED'`);
+      await updateLeaveBalance(db, user_id, type_id, leaveDays);
+    } else if (levelsNeeded === 3) {
+      if (director_status === "WAITING_FOR_L2_APPROVAL" || director_status === "NOT_APPLICABLE") {
+        updates.push(`director_status = 'PENDING'`);
+      }
+    }
+
+    await db.query(`UPDATE leave_requests SET ${updates.join(", ")} WHERE leave_request_id = ?`, [requestId]);
+
+  } else if (role === "DIRECTOR" && director_status === "PENDING") {
+    await db.query(
+      `UPDATE leave_requests 
+       SET director_status = 'APPROVED', overall_status = 'APPROVED' 
+       WHERE leave_request_id = ?`,
+      [requestId]
+    );
+    await updateLeaveBalance(db, user_id, type_id, leaveDays);
+
+  } else {
+    throw new Error("Invalid approval flow or already approved");
+  }
+
+  return { message: `${role} approved the leave` };
+};
+
 
 async function updateLeaveBalance(db, userId, typeId, leaveDays, totalDaysAllowed = null) {
   const [rows] = await db.query(
