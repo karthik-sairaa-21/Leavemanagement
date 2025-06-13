@@ -32,11 +32,11 @@ function LoginForm() {
       localStorage.setItem('user_id', data.user.id);
       const user = JSON.parse(localStorage.getItem('user'));
       const role = user?.role;
-      if(role==="Admin"){
+      if(role==="Admin" || role ==="HR"){
         navigate('/uploadBulkUsers')
       }
       else{
-         navigate('/navbar'); // ✅ This is correct!
+         navigate('/navbar');
       }
     
 
