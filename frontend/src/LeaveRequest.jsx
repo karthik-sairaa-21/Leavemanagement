@@ -64,19 +64,22 @@ function LeaveRequest(props) {
       return;
     }
 
-    try {
-      const response = await fetch(`http://localhost:3000/userLeaveRequest/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          type_id: formData.leaveType,
-          leave_start_date: formData.startDate,
-          leave_end_date: formData.endDate,
-          reason: formData.reason
-        })
-      });
+try {
+  const token = localStorage.getItem("token"); // 🔐 Get the token from localStorage
+
+  const response = await fetch(`http://localhost:3000/userLeaveRequest/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`  // 
+    },
+    body: JSON.stringify({
+      type_id: formData.leaveType,
+      leave_start_date: formData.startDate,
+      leave_end_date: formData.endDate,
+      reason: formData.reason
+    })
+  });
 
       const data = await response.json();
 
@@ -91,6 +94,7 @@ function LeaveRequest(props) {
 
       alert('Leave request submitted successfully!');
       if (props.onSuccess) props.onSuccess();
+        if (props.onSuccess) props.onClose();
 
       // Reset form
       setFormData({

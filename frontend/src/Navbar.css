@@ -23,7 +23,8 @@ body {
 /* Sidebar */
 .sidebar {
   width: 260px;
-  background-color: #fff;
+  /* background-color: #fff; */
+   background-color:#fbfbfb;
   border-right: 2px solid #ccc;
   padding: 20px;
   display: flex;

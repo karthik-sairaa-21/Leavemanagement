@@ -6,7 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import './Calendar.css';
 
 const localizer = momentLocalizer(moment);  //it will handle date in calendar 
-const currentDate= new Date()
+// const currentDate = new Date()
 
 function Calendar() {
     const [leaveRequests, setLeaveRequests] = useState([]);
@@ -35,13 +35,18 @@ function Calendar() {
 
         const fetchLeaves = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/getApprovedRequest/${id}`);
+                const token = localStorage.getItem("token");
+                const response = await fetch(`http://localhost:3000/getApprovedRequest/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
                 const data = await response.json();
 
                 if (!response.ok) throw new Error(data.error || "Failed to fetch leave data");
 
-                const approvedLeaves = data.filter(req => req.overall_status === "APPROVED" 
-                    
+                const approvedLeaves = data.filter(req => req.overall_status === "APPROVED"
+
                 );
                 setLeaveRequests(approvedLeaves);
 
@@ -83,12 +88,23 @@ function Calendar() {
                 startAccessor="start"
                 endAccessor="end"
                 titleAccessor="title"
-                views={['month']} // only allow 'month' view
+                views={['month']}
                 toolbar={true}
-                date={date}             // <-- control visible date here
-                onNavigate={handleNavigate}  // <-- handle navigation here
-               
+                date={date}
+                onNavigate={handleNavigate}
+                dayPropGetter={(date) => {
+                    const day = date.getDay(); // 0 = Sunday, 6 = Saturday
+                    if (day === 0 || day === 6) {
+                        return {
+                            style: {
+                                backgroundColor: "#fbfbfb" // light gray
+                            }
+                        };
+                    }
+                    return {};
+                }}
             />
+
         </div>
     );
 }

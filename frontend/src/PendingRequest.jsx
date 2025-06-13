@@ -31,15 +31,24 @@ function PendingRequest() {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`http://localhost:3000/getLeaveRequest/${userId}`);
+        const response = await fetch(`http://localhost:3000/getLeaveRequest/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
         const requestData = await response.json();
         console.log(requestData);
 
         if (!response.ok) throw new Error(requestData.error || 'Failed to fetch leave requests');
         setLeaveRequests(requestData);
 
-        const typeResponse = await fetch(`http://localhost:3000/leaveType`);
+        const typeResponse = await fetch(`http://localhost:3000/leaveType`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const typeData = await typeResponse.json();
 
         if (!typeResponse.ok) throw new Error(typeData.error || 'Failed to fetch leave types');
@@ -56,10 +65,17 @@ function PendingRequest() {
   }, [userId]);
 
   const handleApproval = async (requestId, status) => {
+       const token = localStorage.getItem("token");
+       if(!token){
+        setError("Used is not authenticated")
+        return ;
+       }
     try {
       const response = await fetch(`http://localhost:3000/leaveApproval/${requestId}/${user.role}/${status}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' ,
+         Authorization: `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {

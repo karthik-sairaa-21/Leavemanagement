@@ -4,6 +4,7 @@ import LeaveRequest from './LeaveRequest';
 import LeaveHistoryTable from './LeaveHistoryTable';
 
 
+
 // For date format
 // const formatDate = (dateStr) => {
 //   if (!dateStr) return 'N/A';
@@ -38,6 +39,7 @@ function Home() {
 
   useEffect(() => {
     const fetchAllData = async () => {
+       const token = localStorage.getItem("token");
       try {
         const leaveTypeResponse = await fetch('http://localhost:3000/leaveType');
         const leaveTypeData = await leaveTypeResponse.json();
@@ -49,7 +51,14 @@ function Home() {
       }
 
       try {
-        const balanceResponse = await fetch(`http://localhost:3000/leaveBalance/${userId}`);
+
+        const balanceResponse = await fetch(`http://localhost:3000/leaveBalance/${userId}`,{
+          headers:{
+            Authorization:`Bearer ${token}`,
+          },
+        
+        }
+      );
         const balanceData = await balanceResponse.json();
         if (!balanceResponse.ok) throw new Error(balanceData.error);
         setLeaveBalance(balanceData);
@@ -59,7 +68,11 @@ function Home() {
       }
 
       try {
-        const requestResponse = await fetch(`http://localhost:3000/getSpecificLeaveRequest/${userId}`);
+        const requestResponse = await fetch(`http://localhost:3000/getSpecificLeaveRequest/${userId}`,{
+          headers:{
+            Authorization:`Bearer ${token}`,
+          }
+        });
         const requestData = await requestResponse.json();
         if (!requestResponse.ok) throw new Error(requestData.error);
         setLeaveRequest(requestData);

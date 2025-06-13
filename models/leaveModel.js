@@ -39,7 +39,7 @@ exports.getAllLeaveTypes = async () => {
 exports.getLeaveRequest = async (userId) => {
   const db = getDB();
   const [result] = await db.query(
-    `SELECT * FROM leave_requests WHERE user_id = ? ORDER BY leave_start_date DESC`,
+    `SELECT * FROM leave_requests WHERE user_id = ? ORDER BY leave_request_id DESC`,
     [userId]
   );
   return result;

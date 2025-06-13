@@ -12,5 +12,4 @@ async function comparePasswords(plainPassword, hashedPassword) {
 module.exports = {
   generateHash,
   comparePasswords
-}
-;
+};
